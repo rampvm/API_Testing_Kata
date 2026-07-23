@@ -12,6 +12,9 @@ import org.junit.jupiter.api.Assertions;
 
 import javax.xml.crypto.Data;
 
+import java.util.List;
+import java.util.Map;
+
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
@@ -32,12 +35,12 @@ public class GetMessages {
 
     @Then("response status code should be {int}")
     public void responseStatusCodeShouldBe(int statusCode) {
-        Assertions.assertEquals(response.statusCode(),statusCode);
+        Assertions.assertEquals(statusCode,response.statusCode());
     }
 
     @And("the response body must have status {string}")
     public void theResponseBodyMustHaveStatus(String status) {
-        Assertions.assertEquals(response.path("status"),status);
+        Assertions.assertEquals(status,response.path("status"));
     }
 
     @When("the user sends a POST request to the path {string} with valid credentials")
@@ -58,7 +61,18 @@ public class GetMessages {
 
     @And("the response body must have error message {string}")
     public void theResponseBodyMustHaveErrorMessage(String error) {
-        Assertions.assertEquals(response.path("error"),"Invalid credentials");
+        Assertions.assertEquals("Invalid credentials",response.path("error"));
     }
 
+    @And("the response body must have all the rooms available.")
+    public void theResponseBodyMustHaveAllTheRoomsAvailable(DataTable roomDetails) {
+        List<Map<String, String>> expectedRooms = roomDetails.asMaps(String.class, String.class);
+        List<Map<String, Object>> actualRooms = response.jsonPath().getList("rooms");
+        for (int i = 0; i < expectedRooms.size(); i++) {
+            Assertions.assertEquals(expectedRooms.get(i).get("roomId"), String.valueOf(actualRooms.get(i).get("roomid")));
+            Assertions.assertEquals(expectedRooms.get(i).get("roomName"), String.valueOf(actualRooms.get(i).get("roomName")));
+            Assertions.assertEquals(expectedRooms.get(i).get("roomPrice"), String.valueOf(actualRooms.get(i).get("roomPrice")));
+            Assertions.assertEquals(expectedRooms.get(i).get("type"), String.valueOf(actualRooms.get(i).get("type")));
+        }
+    }
 }

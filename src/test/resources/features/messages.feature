@@ -23,4 +23,13 @@ Feature: Validating the Booking.com for all the available api for the endpoint "
     Then response status code should be 401
     And the response body must have error message "Invalid credentials"
 
+  Scenario: Verify the rooms exist for booking from the booking application
+    Given the base url of api is "https://automationintesting.online/api"
+    When the user sends a GET request to the path "/room"
+    Then response status code should be 200
+    And the response body must have all the rooms available.
+    |roomId|roomName|roomPrice|type  |
+    |  1   | 101    | 100     |Single|
+    |  2   | 102    | 150     |Double|
+    |  3   | 103    | 225     |Suite |
 
