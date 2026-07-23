@@ -1,6 +1,26 @@
 @message
+Feature: Validating the Booking.com for all the available api for the endpoint "https://automationintesting.online/api"
 
-Feature: Get messages
-  Scenario: Message
-    When I want to read the messages
-    Then I should receive all existing messages
+  Scenario: Verify the application health check endpoint
+    Given the base url of api is "https://automationintesting.online/api"
+    When the user sends a GET request to the path "/booking/actuator/health"
+    Then response status code should be 200
+    And the response body must have status "UP"
+
+  Scenario: Verify successful authentication for valid credentials will generate token
+    Given the base url of api is "https://automationintesting.online/api"
+    When the user sends a POST request to the path "/auth/login" with valid credentials
+    |username |password |
+    |admin    |password |
+    Then response status code should be 200
+    And the response body must have valid token
+
+  Scenario: Verify unsuccessful authentication with invalid credentials will generate error message
+    Given the base url of api is "https://automationintesting.online/api"
+    When the user sends a POST request to the path "/auth/login" with invalid credentials
+      |username |password |
+      |admin    |test123  |
+    Then response status code should be 401
+    And the response body must have error message "Invalid credentials"
+
+
