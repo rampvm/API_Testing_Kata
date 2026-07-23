@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Assertions;
 
 import javax.xml.crypto.Data;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -75,4 +76,19 @@ public class GetMessages {
             Assertions.assertEquals(expectedRooms.get(i).get("type"), String.valueOf(actualRooms.get(i).get("type")));
         }
     }
+
+    @When("the user sends a GET request to the path {string} with {string}")
+    public void theUserSendsAGETRequestToThePathWith(String endPoint, String roomId) {
+        response = api.get("/room/" + roomId);
+    }
+
+    @Then("the response body must have features {string}, roomName {string}, price {int}, and type {string}")
+    public void theResponseBodyMustHaveRoomNameRoomPriceAndType(String features, String roomname, int roomprice, String type) {
+        List<String> expectedFeatures = Arrays.asList(features.split(","));
+        Assertions.assertEquals(expectedFeatures, response.jsonPath().getList("features"));
+        Assertions.assertEquals(roomname, response.path("roomName"));
+        Assertions.assertEquals(roomprice, response.jsonPath().getInt("roomPrice"));
+        Assertions.assertEquals(type, response.path("type"));
+    }
+
 }

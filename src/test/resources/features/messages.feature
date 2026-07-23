@@ -33,3 +33,13 @@ Feature: Validating the Booking.com for all the available api for the endpoint "
     |  2   | 102    | 150     |Double|
     |  3   | 103    | 225     |Suite |
 
+  Scenario Outline: Verify the room details using roomId for booking from the booking application
+    Given the base url of api is "https://automationintesting.online/api"
+    When the user sends a GET request to the path "/room" with "<roomId>"
+    Then response status code should be 200
+    And the response body must have features "<features>", roomName "<roomName>", price <roomPrice>, and type "<type>"
+    Examples:
+      |roomId|roomName|roomPrice|type  |features        |
+      |  1   | 101    | 100     |Single|TV,WiFi,Safe    |
+      |  2   | 102    | 150     |Double|TV,Radio,Safe   |
+      |  3   | 103    | 225     |Suite |Radio,WiFi,Safe |
