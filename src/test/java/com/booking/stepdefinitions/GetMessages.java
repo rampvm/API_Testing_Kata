@@ -166,7 +166,6 @@ public class GetMessages {
         if ("0".equals(bookingId)) {
             throw new IllegalStateException("Test context is empty! Execute booking creation first.");
         }
-
         response = api.get(endpoint + "/" + bookingId);
     }
 
@@ -186,5 +185,35 @@ public class GetMessages {
         Map<String, String> row = newPayload.asMaps(String.class, String.class).get(0);
         BookingPayload payload = mapper.convertValue(row, BookingPayload.class);
         response=api.put(endPoint,payload);
+    }
+
+    @When("the user sends a GET request to the path {string} for existing bookingId with invalid token")
+    public void theUserSendsAGETRequestToThePathForExistingBookingIdWithInvalidToken(String endpoint) {
+        String bookingId = BookingContext.getBookingId();
+        if ("0".equals(bookingId)) {
+            throw new IllegalStateException("Test context is empty! Execute booking creation first.");
+        }
+        response = api.get(endpoint + "/" + bookingId,"123456abc");
+    }
+
+    @When("the user sends a PUT request to the path {string} for existing bookingId with invalid token")
+    public void theUserSendsAPUTRequestToThePathForExistingBookingIdWithInvalidToken(String endPoint,DataTable newPayload) {
+        Map<String, String> row = newPayload.asMaps(String.class, String.class).get(0);
+        BookingPayload payload = mapper.convertValue(row, BookingPayload.class);
+        response=api.put(endPoint,payload,"abc123456");
+    }
+
+    @When("the user sends a PATCH request to the path {string} for existing bookingId")
+    public void theUserSendsAPATCHRequestToThePathForExistingBookingId(String endPoint,DataTable patchPayload) {
+        Map<String, String> row = patchPayload.asMaps(String.class, String.class).get(0);
+        BookingPayload payload = mapper.convertValue(row, BookingPayload.class);
+        response=api.put(endPoint,payload);
+    }
+
+    @When("the user sends a PATCH request to the path {string} for existing bookingId with invalid token")
+    public void theUserSendsAPATCHRequestToThePathForExistingBookingIdWithInvalidToken(String endPoint,DataTable newPayload) {
+        Map<String, String> row = newPayload.asMaps(String.class, String.class).get(0);
+        BookingPayload payload = mapper.convertValue(row, BookingPayload.class);
+        response=api.put(endPoint,payload,"abc123456");
     }
 }

@@ -15,6 +15,14 @@ public class ApiClient {
                 .get(endpoint);
     }
 
+    //For passing invalid Token
+    public Response get(String endpoint,String token) {
+        return given()
+                .contentType(ContentType.JSON)
+                .header("Cookie", "token=" + token)
+                .get(endpoint);
+    }
+
     public Response post(String endpoint, Object body) {
         return given()
                 .contentType(ContentType.JSON)
@@ -31,6 +39,23 @@ public class ApiClient {
     }
 
     public Response put(String endpoint, Object body) {
+        String token = BookingContext.getToken();
+        return given()
+                .contentType(ContentType.JSON)
+                .header("Cookie", "token=" + token)
+                .body(body)
+                .post(endpoint);
+    }
+
+    public Response put(String endpoint, Object body, String token) {
+        return given()
+                .contentType(ContentType.JSON)
+                .header("Cookie", "token=" + token)
+                .body(body)
+                .post(endpoint);
+    }
+
+    public Response patch(String endpoint, Object body) {
         String token = BookingContext.getToken();
         return given()
                 .contentType(ContentType.JSON)
