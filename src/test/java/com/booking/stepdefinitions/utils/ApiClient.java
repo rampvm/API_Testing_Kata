@@ -21,4 +21,13 @@ public class ApiClient {
                 .body(body)
                 .post(endpoint);
     }
+
+    //For objects like BookingPayload
+    public Response post(String endpoint, Object body) {
+        return given()
+                .contentType(ContentType.JSON)
+                .cookie("token", "ULlvP6tpjiu7b1wz")
+                .body(body)
+                .post(endpoint);
+    }
 }

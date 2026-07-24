@@ -1,7 +1,10 @@
 package com.booking.stepdefinitions;
 
+import com.booking.stepdefinitions.config.BookingPayload;
 import com.booking.stepdefinitions.utils.ApiClient;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.datatable.DataTable;
+import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -10,18 +13,21 @@ import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.Assertions;
 
-import javax.xml.crypto.Data;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class GetMessages {
     private Response response;
     private final ApiClient api = new ApiClient();
+    private final ObjectMapper mapper = new ObjectMapper();
+
+    @Before
+    public void setup() {
+        this.response = null;
+    }
 
     @Given("the base url of api is {string}")
     public void theBaseUrlOfApiIs(String baseURL) {
@@ -91,4 +97,62 @@ public class GetMessages {
         Assertions.assertEquals(type, response.path("type"));
     }
 
+    @When("the user sends a POST request to the path {string} with invalid booking request")
+    public void theUserSendsAPOSTRequestToThePathWithInvalidBookingRequest(String endPoint, DataTable payLoad) {
+        Map<String, String> row = payLoad.asMaps(String.class, String.class).get(0);
+            BookingPayload payload = mapper.convertValue(row, BookingPayload.class);
+            response=api.post(endPoint,payload);
+        }
+
+
+    @And("the response body must have errors message")
+    public void theResponseBodyMustHaveErrorsMessage() {
+        List<String> errorMessages = response.jsonPath().getList("errors");
+        assertTrue(
+                errorMessages.contains("must be greater than or equal to 1"),
+                "Expected error message missing! Actual errors found: " + errorMessages
+        );
+    }
+
+    @And("the response body must have bookingId")
+    public void theResponseBodyMustHaveBookingId() {
+        Object bookingId = response.path("bookingid");
+        Assertions.assertNotNull(bookingId);
+        assertTrue(bookingId instanceof Number, "Expected 'bookingid' to be a numeric type.");
+    }
+
+    @When("the user sends a POST request to the path {string} with invalid booking firstname")
+    public void theUserSendsAPOSTRequestToThePathWithInvalidBookingFirstname(String endPoint,DataTable payLoad) {
+        Map<String, String> row = payLoad.asMaps(String.class, String.class).get(0);
+        BookingPayload payload = mapper.convertValue(row, BookingPayload.class);
+        response=api.post(endPoint,payload);
+    }
+
+    @And("the response body must have errors message {string}")
+    public void theResponseBodyMustHaveErrorsMessage(String error) {
+        List<String> errors = response.jsonPath().getList("errors");
+        assertTrue(errors.contains(error),
+                "Expected message missing from errors list! Found: " + errors);
+    }
+
+    @When("the user sends a POST request to the path {string} with invalid booking lastname")
+    public void theUserSendsAPOSTRequestToThePathWithInvalidBookingLastname(String endPoint,DataTable payLoad) {
+        Map<String, String> row = payLoad.asMaps(String.class, String.class).get(0);
+        BookingPayload payload = mapper.convertValue(row, BookingPayload.class);
+        response=api.post(endPoint,payload);
+    }
+
+    @When("the user sends a POST request to the path {string} with invalid booking email")
+    public void theUserSendsAPOSTRequestToThePathWithInvalidBookingEmail(String endPoint,DataTable payLoad) {
+        Map<String, String> row = payLoad.asMaps(String.class, String.class).get(0);
+        BookingPayload payload = mapper.convertValue(row, BookingPayload.class);
+        response=api.post(endPoint,payload);
+    }
+
+    @When("the user sends a POST request to the path {string} with invalid booking phoneNumber")
+    public void theUserSendsAPOSTRequestToThePathWithInvalidBookingPhoneNumber(String endPoint,DataTable payLoad) {
+        Map<String, String> row = payLoad.asMaps(String.class, String.class).get(0);
+        BookingPayload payload = mapper.convertValue(row, BookingPayload.class);
+        response=api.post(endPoint,payload);
+    }
 }

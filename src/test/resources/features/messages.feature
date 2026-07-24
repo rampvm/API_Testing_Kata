@@ -43,3 +43,44 @@ Feature: Validating the Booking.com for all the available api for the endpoint "
       |  1   | 101    | 100     |Single|TV,WiFi,Safe    |
       |  2   | 102    | 150     |Double|TV,Radio,Safe   |
       |  3   | 103    | 225     |Suite |Radio,WiFi,Safe |
+
+
+  Scenario: Verify the booking id for the booking end point when sending booking details
+    Given the base url of api is "https://automationintesting.online/api"
+    When the user sends a POST request to the path "/booking" with invalid booking request
+      |roomid|  firstname         |    lastname        |depositpaid|bookingdates.checkin|bookingdates.checkout|email             |phone           |
+      |  1   |  123456            |    abcdefghijklmnop|           |    2026-07-23      |    2026-07-24       | 123@email.com    |  123456789012   |
+    Then response status code should be 201
+    And the response body must have bookingId
+
+  Scenario: Verify the error messages for the booking end point when sending invalid firstname
+    Given the base url of api is "https://automationintesting.online/api"
+    When the user sends a POST request to the path "/booking" with invalid booking firstname
+      |roomid|  firstname         |    lastname        |depositpaid|bookingdates.checkin|bookingdates.checkout|email             |phone           |
+      |  1   |  1                 |    abcdefghij      |           |    2026-07-23      |    2026-07-24       | 123@email.com    |  12345678901   |
+    Then response status code should be 400
+    And the response body must have errors message "size must be between 3 and 18"
+
+  Scenario: Verify the error messages for the booking end point when sending invalid lastname
+    Given the base url of api is "https://automationintesting.online/api"
+    When the user sends a POST request to the path "/booking" with invalid booking lastname
+      |roomid|  firstname         |    lastname        |depositpaid|bookingdates.checkin|bookingdates.checkout|email             |phone           |
+      |  1   |  abcdefghij        |    1               |           |    2026-07-23      |    2026-07-24       | 123@email.com    |  12345678901   |
+    Then response status code should be 400
+    And the response body must have errors message "size must be between 3 and 30"
+
+  Scenario: Verify the error messages for the booking end point when sending invalid email
+    Given the base url of api is "https://automationintesting.online/api"
+    When the user sends a POST request to the path "/booking" with invalid booking email
+      |roomid|  firstname         |    lastname        |depositpaid|bookingdates.checkin|bookingdates.checkout|email             |phone           |
+      |  1   |  abcdefghij        |    abcdefghij      |           |    2026-07-23      |    2026-07-24       | 123              |  12345678901   |
+    Then response status code should be 400
+    And the response body must have errors message "must be a well-formed email address"
+
+  Scenario: Verify the error messages for the booking end point when sending invalid phoneNumber
+    Given the base url of api is "https://automationintesting.online/api"
+    When the user sends a POST request to the path "/booking" with invalid booking phoneNumber
+      |roomid|  firstname         |    lastname        |depositpaid|bookingdates.checkin|bookingdates.checkout|email             |phone           |
+      |  1   |  abcdefghij        |    abcdefghij      |           |    2026-07-23      |    2026-07-24       | 123@email.com    |  0123          |
+    Then response status code should be 400
+    And the response body must have errors message "size must be between 11 and 21"
