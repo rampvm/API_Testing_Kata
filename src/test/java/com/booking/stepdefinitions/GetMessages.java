@@ -1,5 +1,6 @@
 package com.booking.stepdefinitions;
 
+import com.booking.stepdefinitions.config.BookingContext;
 import com.booking.stepdefinitions.config.BookingPayload;
 import com.booking.stepdefinitions.utils.ApiClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,13 +22,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class GetMessages {
     private Response response;
-    private final ApiClient api = new ApiClient();
+    private static final ApiClient api = new ApiClient();
     private final ObjectMapper mapper = new ObjectMapper();
+
 
     @Before
     public void setup() {
         this.response = null;
     }
+
 
     @Given("the base url of api is {string}")
     public void theBaseUrlOfApiIs(String baseURL) {
@@ -52,13 +55,14 @@ public class GetMessages {
 
     @When("the user sends a POST request to the path {string} with valid credentials")
     public void theUserSendsAPOSTRequestToThePathWithValidCredentials(String endpoint, DataTable payload) {
-
-        response=api.post(endpoint,payload.asMaps(String.class, String.class).get(0));
+        response = api.post(endpoint, payload.asMaps(String.class, String.class).get(0));
     }
 
     @And("the response body must have valid token")
     public void theResponseBodyMustHaveValidToken() {
         Assertions.assertNotNull(response.path("token"));
+        String extractedToken = response.jsonPath().getString("token");
+        BookingContext.setToken(extractedToken);
     }
 
     @When("the user sends a POST request to the path {string} with invalid credentials")
@@ -97,8 +101,8 @@ public class GetMessages {
         Assertions.assertEquals(type, response.path("type"));
     }
 
-    @When("the user sends a POST request to the path {string} with invalid booking request")
-    public void theUserSendsAPOSTRequestToThePathWithInvalidBookingRequest(String endPoint, DataTable payLoad) {
+    @When("the user sends a POST request to the path {string} with valid booking request")
+    public void theUserSendsAPOSTRequestToThePathWithValidBookingRequest(String endPoint, DataTable payLoad) {
         Map<String, String> row = payLoad.asMaps(String.class, String.class).get(0);
             BookingPayload payload = mapper.convertValue(row, BookingPayload.class);
             response=api.post(endPoint,payload);
@@ -116,9 +120,9 @@ public class GetMessages {
 
     @And("the response body must have bookingId")
     public void theResponseBodyMustHaveBookingId() {
-        Object bookingId = response.path("bookingid");
-        Assertions.assertNotNull(bookingId);
-        assertTrue(bookingId instanceof Number, "Expected 'bookingid' to be a numeric type.");
+        Object rawBookingId = response.path("bookingid");
+        Assertions.assertNotNull(rawBookingId);
+        BookingContext.setBookingId(rawBookingId);
     }
 
     @When("the user sends a POST request to the path {string} with invalid booking firstname")
@@ -154,5 +158,33 @@ public class GetMessages {
         Map<String, String> row = payLoad.asMaps(String.class, String.class).get(0);
         BookingPayload payload = mapper.convertValue(row, BookingPayload.class);
         response=api.post(endPoint,payload);
+    }
+
+    @When("the user sends a GET request to the path {string} for existing bookingId")
+    public void theUserSendsAGETRequestToThePathForExistingBookingId(String endpoint) {
+        String bookingId = BookingContext.getBookingId();
+        if ("0".equals(bookingId)) {
+            throw new IllegalStateException("Test context is empty! Execute booking creation first.");
+        }
+
+        response = api.get(endpoint + "/" + bookingId);
+    }
+
+    @And("the response body must have all the booking details")
+    public void theResponseBodyMustHaveAllTheBookingDetails(DataTable expResponseBody) {
+        Map<String, String> expected = expResponseBody.asMaps(String.class, String.class).get(0);
+        Assertions.assertEquals(Integer.parseInt(expected.get("roomid")),response.jsonPath().getInt("roomid"),"Room ID mismatch!");
+        Assertions.assertEquals(expected.get("firstname"),response.jsonPath().getString("firstname"),"Firstname mismatch!");
+        Assertions.assertEquals(expected.get("lastname"),response.jsonPath().getString("lastname"),"Lastname mismatch!");
+        Assertions.assertEquals(expected.get("bookingdates.checkin"),response.jsonPath().getString("bookingdates.checkin"),"Check-in date mismatch!");
+        Assertions.assertEquals(expected.get("bookingdates.checkout"),response.jsonPath().getString("bookingdates.checkout"),"Check-out date mismatch!");
+        System.out.println("✅ All booking details verified successfully!");
+    }
+
+    @When("the user sends a PUT request to the path {string} for existing bookingId")
+    public void theUserSendsAPUTRequestToThePathForExistingBookingId(String endPoint,DataTable newPayload) {
+        Map<String, String> row = newPayload.asMaps(String.class, String.class).get(0);
+        BookingPayload payload = mapper.convertValue(row, BookingPayload.class);
+        response=api.put(endPoint,payload);
     }
 }

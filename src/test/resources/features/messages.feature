@@ -23,7 +23,7 @@ Feature: Validating the Booking.com for all the available api for the endpoint "
     Then response status code should be 401
     And the response body must have error message "Invalid credentials"
 
-  Scenario: Verify the rooms exist for booking from the booking application
+  Scenario: Verify the rooms exist for booking from the booking.com application
     Given the base url of api is "https://automationintesting.online/api"
     When the user sends a GET request to the path "/room"
     Then response status code should be 200
@@ -45,13 +45,32 @@ Feature: Validating the Booking.com for all the available api for the endpoint "
       |  3   | 103    | 225     |Suite |Radio,WiFi,Safe |
 
 
-  Scenario: Verify the booking id for the booking end point when sending booking details
+  Scenario: Verify the booking id for the booking endpoint when sending booking details with valid auth token
     Given the base url of api is "https://automationintesting.online/api"
-    When the user sends a POST request to the path "/booking" with invalid booking request
-      |roomid|  firstname         |    lastname        |depositpaid|bookingdates.checkin|bookingdates.checkout|email             |phone           |
-      |  1   |  123456            |    abcdefghijklmnop|           |    2026-07-23      |    2026-07-24       | 123@email.com    |  123456789012   |
+    When the user sends a POST request to the path "/booking" with valid booking request
+      |roomid|  firstname         |    lastname        |depositpaid|bookingdates.checkin|bookingdates.checkout|  email           |   phone        |
+      |  2   |  123456            |    abcdefghijklmnop|           |    2026-07-23      |    2026-07-24       | 123@email.com    |  123456789012  |
     Then response status code should be 201
     And the response body must have bookingId
+
+  Scenario: Verify the exist booking from the booking.com application with valid auth token
+    Given the base url of api is "https://automationintesting.online/api"
+    When the user sends a GET request to the path "/booking" for existing bookingId
+    Then response status code should be 200
+    And the response body must have all the booking details
+      |roomid|  firstname         |    lastname        |depositpaid|bookingdates.checkin|bookingdates.checkout|email             |phone           |
+      |  2   |  123456            |    abcdefghijklmnop|           |    2026-07-23      |    2026-07-24       | 123@email.com    |  123456789012  |
+
+  Scenario: Verify the updation of the exist booking from the booking.com application with valid auth token
+    Given the base url of api is "https://automationintesting.online/api"
+    When the user sends a PUT request to the path "/booking" for existing bookingId
+      |roomid|  firstname         |    lastname        |depositpaid|bookingdates.checkin|bookingdates.checkout|email             |phone           |
+      |  3   |  updatefirstname   |    updatelastname  |           |    2026-07-23      |    2026-07-24       | 1234@email.com    |  98745632198  |
+    Then response status code should be 200
+    And the response body must have all the booking details
+      |roomid|  firstname         |    lastname        |depositpaid|bookingdates.checkin|bookingdates.checkout|email             |phone           |
+      |  3   |  updatefirstname   |    updatelastname  |           |    2026-07-23      |    2026-07-24       | 1234@email.com    |  98745632198  |
+
 
   Scenario: Verify the error messages for the booking end point when sending invalid firstname
     Given the base url of api is "https://automationintesting.online/api"
@@ -84,3 +103,4 @@ Feature: Validating the Booking.com for all the available api for the endpoint "
       |  1   |  abcdefghij        |    abcdefghij      |           |    2026-07-23      |    2026-07-24       | 123@email.com    |  0123          |
     Then response status code should be 400
     And the response body must have errors message "size must be between 11 and 21"
+

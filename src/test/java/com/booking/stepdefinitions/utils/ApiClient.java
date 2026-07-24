@@ -1,32 +1,40 @@
 package com.booking.stepdefinitions.utils;
 
+import com.booking.stepdefinitions.config.BookingContext;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-
-import java.util.Map;
-
 import static io.restassured.RestAssured.given;
 
 public class ApiClient {
 
     public Response get(String endpoint) {
+        String token = BookingContext.getToken();
         return given()
                 .contentType(ContentType.JSON)
+                .header("Cookie", "token=" + token)
                 .get(endpoint);
     }
 
-    public Response post(String endpoint, Map<String, String> body) {
+    public Response post(String endpoint, Object body) {
         return given()
                 .contentType(ContentType.JSON)
                 .body(body)
                 .post(endpoint);
     }
 
-    //For objects like BookingPayload
-    public Response post(String endpoint, Object body) {
+    public Response post(String endpoint, Object body, String token) {
         return given()
                 .contentType(ContentType.JSON)
-                .cookie("token", "ULlvP6tpjiu7b1wz")
+                .header("Cookie", "token=" + token)
+                .body(body)
+                .post(endpoint);
+    }
+
+    public Response put(String endpoint, Object body) {
+        String token = BookingContext.getToken();
+        return given()
+                .contentType(ContentType.JSON)
+                .header("Cookie", "token=" + token)
                 .body(body)
                 .post(endpoint);
     }
