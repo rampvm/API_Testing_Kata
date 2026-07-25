@@ -235,3 +235,17 @@ Feature: Validating the Booking.com for all the available api for the endpoint "
       |  abcdefghijklmnop|      123@email.com   |  123456789012  |  tests     | sampletext   |
     Then response status code should be 400
     And the response must have error message "Message must be between 20 and 2000 characters."
+
+  @extravalidate
+  Scenario: Validate the token which is generated on login
+    Given the base url of api is "https://automationintesting.online/api"
+    When the user sends a POST request to the path "auth/validate" with generated tokenid
+    Then response status code should be 200
+    And the response must have valid as true
+
+  @extravalidate
+  Scenario: Validate the invalid token which is generate an error
+    Given the base url of api is "https://automationintesting.online/api"
+    When the user sends a POST request to the path "auth/validate" with generated tokenid
+    Then response status code should be 403
+    And the response must have valid as error "Invalid token"

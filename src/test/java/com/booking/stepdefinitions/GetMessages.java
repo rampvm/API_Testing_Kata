@@ -281,4 +281,19 @@ public class GetMessages {
         List<String> errors = response.jsonPath().getList("$", String.class);
         Assertions.assertEquals(error, errors.get(0));
     }
+
+    @When("the user sends a POST request to the path {string} with generated tokenid")
+    public void theUserSendsAPOSTRequestToThePathWithGeneratedTokenid(String endpoing) {
+        response=api.post(endpoing);
+    }
+
+    @And("the response must have valid as true")
+    public void theResponseMustHaveValidAsTrue() {
+        Assertions.assertEquals(true,response.path("valid"));
+    }
+
+    @And("the response must have valid as error {string}")
+    public void theResponseMustHaveValidAsErrorInvalidToken(String error) {
+        Assertions.assertEquals(error,response.path("error"));
+    }
 }

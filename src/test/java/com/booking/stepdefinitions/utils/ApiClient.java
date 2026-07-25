@@ -34,6 +34,13 @@ public class ApiClient {
                 .get(endpoint);
     }
 
+    public Response post(String endpoint) {
+        String jsonBody = String.format("{\"token\":\"%s\"}", BookingContext.getToken());
+        return given()
+                .contentType(ContentType.JSON)
+                .body(jsonBody)
+                .post(endpoint);
+    }
     public Response post(String endpoint, Object body) {
         return given()
                 .contentType(ContentType.JSON)
