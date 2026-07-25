@@ -177,7 +177,6 @@ public class GetMessages {
         Assertions.assertEquals(expected.get("lastname"),response.jsonPath().getString("lastname"),"Lastname mismatch!");
         Assertions.assertEquals(expected.get("bookingdates.checkin"),response.jsonPath().getString("bookingdates.checkin"),"Check-in date mismatch!");
         Assertions.assertEquals(expected.get("bookingdates.checkout"),response.jsonPath().getString("bookingdates.checkout"),"Check-out date mismatch!");
-        System.out.println("✅ All booking details verified successfully!");
     }
 
     @When("the user sends a PUT request to the path {string} for existing bookingId")
@@ -244,5 +243,42 @@ public class GetMessages {
     @And("the response body have errors message {string}")
     public void theResponseBodyHaveErrorsMessage(String error) {
         Assertions.assertEquals(error,response.path("error"));
+    }
+
+    @When("user sends a GET request to the {string} with a specific checkin and checkout dates")
+    public void userSendsAGETRequestToTheWithASpecificCheckinAndCheckoutDates(String endpoint,DataTable dates) {
+        Map<String, String> queryParams = dates.asMaps(String.class, String.class).get(0);
+        response = api.get(endpoint,BookingContext.getToken(),queryParams);
+    }
+
+    @And("user must see the available rooms in response")
+    public void userMustSeeTheAvailableRoomsInResponse() {
+        Assertions.assertNotNull(response.path("rooms"));
+        java.util.List<Object> roomsList = response.path("rooms");
+        Assertions.assertFalse(roomsList.isEmpty(), "The rooms array should not be empty!");
+    }
+
+    @When("the user sends a POST request to the path {string}")
+    public void theUserSendsAPOSTRequestToThePath(String endPoint,DataTable message) {
+        Map<String, String> row = message.asMaps(String.class, String.class).get(0);
+        response=api.post(endPoint,row);
+    }
+
+    @And("the response body must have success : true")
+    public void theResponseBodyMustHaveSuccessTrue() {
+        Assertions.assertEquals(true,response.path("success"));
+    }
+
+    @And("the response body must have error message {string} and {string}")
+    public void theResponseBodyMustHaveErrorMessageAnd(String error1, String error2) {
+        List<String> errors = response.jsonPath().getList("$", String.class);
+        Assertions.assertTrue(errors.contains(error1));
+        Assertions.assertTrue(errors.contains(error2));
+    }
+
+    @And("the response must have error message {string}")
+    public void theResponseMustHaveErrorMessage(String error) {
+        List<String> errors = response.jsonPath().getList("$", String.class);
+        Assertions.assertEquals(error, errors.get(0));
     }
 }

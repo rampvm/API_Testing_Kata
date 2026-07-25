@@ -51,6 +51,15 @@ Feature: Validating the Booking.com for all the available api for the endpoint "
       |  2   | 102    | 150     |Double|TV,Radio,Safe   |
       |  3   | 103    | 225     |Suite |Radio,WiFi,Safe |
 
+  @regression
+  Scenario: Verify the availability of rooms for a given dates with a valid auth token
+    Given the base url of api is "https://automationintesting.online/api"
+    When user sends a GET request to the "/room" with a specific checkin and checkout dates
+      | checkin         |     checkout     |
+      | 2026-07-23      |    2026-07-24    |
+    Then response status code should be 200
+    And user must see the available rooms in response
+
   @sanity
   @regression
   @e2e
@@ -181,3 +190,48 @@ Feature: Validating the Booking.com for all the available api for the endpoint "
     When the user sends a DELETE request to the path "/booking" for existing bookingId with invalid token
      #Response code for auth failure i am getting 403 not 401 (may be not defined in sandbox)
     Then response status code should be 403
+
+  @regression
+  Scenario: Verify the contact form via message for the booking endpoint when sending valid message
+    Given the base url of api is "https://automationintesting.online/api"
+    When the user sends a POST request to the path "/message"
+      |name              |      email           |   phone        |subject     |description                                  |
+      |  abcdefghijklmnop|     123@email.com    |  123456789012  |  tests     | sampletext here so we can add any 123456789 |
+    Then response status code should be 200
+    And the response body must have success : true
+
+  @regression
+  Scenario: Verify the contact form via message for the booking endpoint when sending without email
+    Given the base url of api is "https://automationintesting.online/api"
+    When the user sends a POST request to the path "/message"
+      |name              |      email           |   phone        |subject     |description                                  |
+      |  abcdefghijklmnop|                      |  123456789012  |  tests     | sampletext here so we can add any 123456789 |
+    Then response status code should be 400
+    And the response body must have error message "Email must be set" and "Email may not be blank"
+
+  @regression
+  Scenario: Verify the contact form via message for the booking endpoint when sending phone number with only 5 numbers
+    Given the base url of api is "https://automationintesting.online/api"
+    When the user sends a POST request to the path "/message"
+      |name              |      email           |   phone        |subject     |description                                  |
+      |  abcdefghijklmnop|      123@email.com   |  12345         |  tests     | sampletext here so we can add any 123456789 |
+    Then response status code should be 400
+    And the response must have error message "Phone must be between 11 and 21 characters."
+
+  @regression
+  Scenario: Verify the contact form via message for the booking endpoint when sending subject with less than 5 char
+    Given the base url of api is "https://automationintesting.online/api"
+    When the user sends a POST request to the path "/message"
+      |name              |      email           |   phone        |subject     |description                                  |
+      |  abcdefghijklmnop|      123@email.com   |  123456789012  |  test      | sampletext here so we can add any 123456789 |
+    Then response status code should be 400
+    And the response must have error message "Subject must be between 5 and 100 characters."
+
+  @regression
+  Scenario: Verify the contact form via message for the booking endpoint when sending description with only 10 char
+    Given the base url of api is "https://automationintesting.online/api"
+    When the user sends a POST request to the path "/message"
+      |name              |      email           |   phone        |subject     |description   |
+      |  abcdefghijklmnop|      123@email.com   |  123456789012  |  tests     | sampletext   |
+    Then response status code should be 400
+    And the response must have error message "Message must be between 20 and 2000 characters."

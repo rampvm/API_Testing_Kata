@@ -3,6 +3,9 @@ package com.booking.stepdefinitions.utils;
 import com.booking.stepdefinitions.config.BookingContext;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+
+import java.util.Map;
+
 import static io.restassured.RestAssured.given;
 
 public class ApiClient {
@@ -20,6 +23,14 @@ public class ApiClient {
         return given()
                 .contentType(ContentType.JSON)
                 .header("Cookie", "token=" + token)
+                .get(endpoint);
+    }
+
+    public Response get(String endpoint, String token, Map<String, String> queryParams) {
+        return given()
+                .contentType(ContentType.JSON)
+                .header("Cookie", "token=" + token)
+                .queryParams(queryParams)
                 .get(endpoint);
     }
 
