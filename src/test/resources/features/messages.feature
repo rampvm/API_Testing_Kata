@@ -255,8 +255,8 @@ Feature: Validating the Booking.com for all the available api for the endpoint "
   Scenario: Verify new room creation for the booking endpoint when sending the room details for valid auth token
     Given the base url of api is "https://automationintesting.online/api"
     When the user sends a POST request to the path "/room" with room details
-      |  roomName   |      type     |  accessible   |description                                |image                                              |roomPrice| features                                          |
-      |  105        |      Family   |  true         |  Please enter a description for this room | https://www.mwtestconsultancy.co.uk/img/room1.jpg |300      |["WiFi","TV","Radio","Refreshments","Safe","Views"]|
+      |  roomName   |      type     |  accessible   |description                                |image                                              |roomPrice| features    |
+      |  105        |      Family   |  true         |  Please enter a description for this room | https://www.mwtestconsultancy.co.uk/img/room1.jpg |300      |WiFi,TV,Radio|
     Then response status code should be 200
     And the response must have success true
 
@@ -264,8 +264,8 @@ Feature: Validating the Booking.com for all the available api for the endpoint "
   Scenario: Verify new room creation for the booking endpoint when sending the wrong details for valid auth token give error
     Given the base url of api is "https://automationintesting.online/api"
     When the user sends a POST request to the path "/room" with room details
-      |  roomName   |      type     |  accessible   |description                                |image                                              |roomPrice| features                                          |
-      |             |      Family   |  true         |  Please enter a description for this room | https://www.mwtestconsultancy.co.uk/img/room1.jpg |300      |["WiFi","TV","Radio","Refreshments","Safe","Views"]|
+      |  roomName   |      type     |  accessible   |description                                |image                                              |roomPrice| features    |
+      |             |      Family   |  true         |  Please enter a description for this room | https://www.mwtestconsultancy.co.uk/img/room1.jpg |300      |WiFi,TV,Radio|
     Then response status code should be 400
     And the response must have error "Room name must be set"
 
@@ -273,8 +273,8 @@ Feature: Validating the Booking.com for all the available api for the endpoint "
   Scenario: Verify new room creation for the booking endpoint when sending the wrong details for valid auth token give error
     Given the base url of api is "https://automationintesting.online/api"
     When the user sends a POST request to the path "/room" with room details
-      |  roomName   |      type     |  accessible   |description                      |image                                              |roomPrice| features                                          |
-      |   106       |               |  true         |  Please enter a description     | https://www.mwtestconsultancy.co.uk/img/room1.jpg |300      |["WiFi","TV","Radio","Refreshments","Safe","Views"]|
+      |  roomName   |      type     |  accessible   |description                      |image                                              |roomPrice| features    |
+      |   106       |               |  true         |  Please enter a description     | https://www.mwtestconsultancy.co.uk/img/room1.jpg |300      |WiFi,TV,Radio|
     Then response status code should be 400
     And the response must have error "Type must be set"
 
