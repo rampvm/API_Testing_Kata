@@ -11,10 +11,12 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
+import io.restassured.internal.common.assertion.AssertionSupport;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.Assertions;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -295,5 +297,63 @@ public class GetMessages {
     @And("the response must have valid as error {string}")
     public void theResponseMustHaveValidAsErrorInvalidToken(String error) {
         Assertions.assertEquals(error,response.path("error"));
+    }
+
+    @When("the user sends a POST request to the path {string} with room details")
+    public void theUserSendsAPOSTRequestToThePathWithRoomDetails(String endpoint, DataTable roomDetails) {
+        Map<String, String> rawData = roomDetails.asMaps(String.class, String.class).get(0);
+        
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("roomName", rawData.get("roomName"));
+        requestBody.put("type", rawData.get("type"));
+        requestBody.put("accessible", Boolean.parseBoolean(rawData.get("accessible")));
+        requestBody.put("description", rawData.get("description"));
+        requestBody.put("image", rawData.get("image"));
+        requestBody.put("roomPrice", Integer.parseInt(rawData.get("roomPrice")));
+        List<String> featureList = Arrays.asList(rawData.get("features").split(",\\s*"));
+        requestBody.put("features", featureList);
+        
+        response=api.post(endpoint,requestBody,BookingContext.getToken());
+    }
+
+    @And("the response must have success true")
+    public void theResponseMustHaveSuccessTrue() {
+        Assertions.assertEquals(true,response.path("success"));
+    }
+
+    @And("the response must have error {string}")
+    public void theResponseMustHaveError(String error) {
+        List<String> errors = response.path("errors");
+        Assertions.assertTrue(errors.contains(error));
+    }
+
+    @And("the response must have booking details for all rooms")
+    public void theResponseMustHaveBookingDetailsForAllRooms() {
+        Assertions.assertNotNull(response.path("report"));
+        java.util.List<Object> reportsList = response.path("report");
+        Assertions.assertFalse(reportsList.isEmpty(), "No rooms are booked and nothing to show!");
+
+    }
+
+    @And("the response must have details of the hotel with location and address etc")
+    public void theResponseMustHaveDetailsOfTheHotelWithLocationAndAddressEtc() {
+        Assertions.assertNotNull(response.body());
+        Map<String, Object> address = response.jsonPath().getMap("address");
+        Map<String, Object> contact = response.jsonPath().getMap("contact");
+
+        Assertions.assertEquals("Shady Meadows B&B", response.path("name"));
+        Assertions.assertEquals("Dilbery", address.get("county"));
+        Assertions.assertEquals("Shady Meadows B&B", address.get("line1"));
+        Assertions.assertEquals("N1 1AA", address.get("postCode"));
+        Assertions.assertEquals("fake@fakeemail.com", contact.get("email"));
+        Assertions.assertEquals("012345678901", contact.get("phone"));
+
+    }
+
+    @And("the response must have message sent by users")
+    public void theResponseMustHaveMessageSentByUsers() {
+        Assertions.assertNotNull(response.path("messages"));
+        java.util.List<Object> reportsList = response.path("messages");
+        Assertions.assertFalse(reportsList.isEmpty(), "No Messages to display!");
     }
 }

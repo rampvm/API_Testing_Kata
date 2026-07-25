@@ -222,7 +222,7 @@ Feature: Validating the Booking.com for all the available api for the endpoint "
   Scenario: Verify the contact form via message for the booking endpoint when sending subject with less than 5 char
     Given the base url of api is "https://automationintesting.online/api"
     When the user sends a POST request to the path "/message"
-      |name              |      email           |   phone        |subject     |description                                  |
+      |   name           |      email           |   phone        |subject     |description                                  |
       |  abcdefghijklmnop|      123@email.com   |  123456789012  |  test      | sampletext here so we can add any 123456789 |
     Then response status code should be 400
     And the response must have error message "Subject must be between 5 and 100 characters."
@@ -249,3 +249,52 @@ Feature: Validating the Booking.com for all the available api for the endpoint "
     When the user sends a POST request to the path "auth/validate" with generated tokenid
     Then response status code should be 403
     And the response must have valid as error "Invalid token"
+
+  @extravalidate
+  Scenario: Verify new room creation for the booking endpoint when sending the room details for valid auth token
+    Given the base url of api is "https://automationintesting.online/api"
+    When the user sends a POST request to the path "/room" with room details
+      |  roomName   |      type     |  accessible   |description                                |image                                              |roomPrice| features                                          |
+      |  105        |      Family   |  true         |  Please enter a description for this room | https://www.mwtestconsultancy.co.uk/img/room1.jpg |300      |["WiFi","TV","Radio","Refreshments","Safe","Views"]|
+    Then response status code should be 200
+    And the response must have success true
+
+  @extravalidate
+  Scenario: Verify new room creation for the booking endpoint when sending the wrong details for valid auth token give error
+    Given the base url of api is "https://automationintesting.online/api"
+    When the user sends a POST request to the path "/room" with room details
+      |  roomName   |      type     |  accessible   |description                                |image                                              |roomPrice| features                                          |
+      |             |      Family   |  true         |  Please enter a description for this room | https://www.mwtestconsultancy.co.uk/img/room1.jpg |300      |["WiFi","TV","Radio","Refreshments","Safe","Views"]|
+    Then response status code should be 400
+    And the response must have error "Room name must be set"
+
+  @extravalidate
+  Scenario: Verify new room creation for the booking endpoint when sending the wrong details for valid auth token give error
+    Given the base url of api is "https://automationintesting.online/api"
+    When the user sends a POST request to the path "/room" with room details
+      |  roomName   |      type     |  accessible   |description                      |image                                              |roomPrice| features                                          |
+      |   106       |               |  true         |  Please enter a description     | https://www.mwtestconsultancy.co.uk/img/room1.jpg |300      |["WiFi","TV","Radio","Refreshments","Safe","Views"]|
+    Then response status code should be 400
+    And the response must have error "Type must be set"
+
+  @extravalidate
+  Scenario: Verify the reports on booking from the booking.com application with valid auth token
+    Given the base url of api is "https://automationintesting.online/api"
+    When the user sends a GET request to the path "/report"
+    Then response status code should be 200
+    And the response must have booking details for all rooms
+
+  @extravalidate
+  Scenario: Verify the hotel details of booking.com application with valid auth token
+    Given the base url of api is "https://automationintesting.online/api"
+    When the user sends a GET request to the path "/branding"
+    Then response status code should be 200
+    And the response must have details of the hotel with location and address etc
+
+  @extravalidate
+  Scenario: Verify the message received from users for the booking.com application with valid auth token
+    Given the base url of api is "https://automationintesting.online/api"
+    When the user sends a GET request to the path "/message"
+    Then response status code should be 200
+    And the response must have message sent by users
+
