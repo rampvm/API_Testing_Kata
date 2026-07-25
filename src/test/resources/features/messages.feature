@@ -7,6 +7,7 @@ Feature: Validating the Booking.com for all the available api for the endpoint "
     When the user sends a GET request to the path "/booking/actuator/health"
     Then response status code should be 200
     And the response body must have status "UP"
+
   @sanity
   @regression
   @e2e
