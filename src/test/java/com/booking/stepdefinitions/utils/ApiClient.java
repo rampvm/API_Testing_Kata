@@ -63,4 +63,19 @@ public class ApiClient {
                 .body(body)
                 .post(endpoint);
     }
+
+    public Response delete(String endpoint) {
+        String token = BookingContext.getToken();
+        return given()
+                .contentType(ContentType.JSON)
+                .header("Cookie", "token=" + token)
+                .delete(endpoint);
+    }
+
+    public Response delete(String endpoint,String token) {
+        return given()
+                .contentType(ContentType.JSON)
+                .header("Cookie", "token=" + token)
+                .delete(endpoint);
+    }
 }

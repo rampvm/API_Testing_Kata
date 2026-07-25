@@ -216,4 +216,21 @@ public class GetMessages {
         BookingPayload payload = mapper.convertValue(row, BookingPayload.class);
         response=api.put(endPoint,payload,"abc123456");
     }
+
+    @When("the user sends a DELETE request to the path {string} for existing bookingId")
+    public void theUserSendsADELETERequestToThePathForExistingBookingId(String endpoint) {
+        String bookingId = BookingContext.getBookingId();
+        response=api.delete(endpoint+ "/" + bookingId);
+    }
+
+    @And("the response body must have message {string}")
+    public void theResponseBodyMustHaveMessage(String message) {
+        Assertions.assertEquals(message,response.path("message"));
+    }
+
+    @When("the user sends a DELETE request to the path {string} for existing bookingId with invalid token")
+    public void theUserSendsADELETERequestToThePathForExistingBookingIdWithInvalidToken(String endPoint) {
+        String bookingId = BookingContext.getBookingId();
+        response=api.delete(endPoint+ "/" + bookingId,"abc123456");
+    }
 }

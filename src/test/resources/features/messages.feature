@@ -1,12 +1,15 @@
 @message
 Feature: Validating the Booking.com for all the available api for the endpoint "https://automationintesting.online/api"
 
+  @health
   Scenario: Verify the application health check endpoint
     Given the base url of api is "https://automationintesting.online/api"
     When the user sends a GET request to the path "/booking/actuator/health"
     Then response status code should be 200
     And the response body must have status "UP"
-
+  @sanity
+  @regression
+  @e2e
   Scenario: Verify successful authentication for valid credentials will generate token
     Given the base url of api is "https://automationintesting.online/api"
     When the user sends a POST request to the path "/auth/login" with valid credentials
@@ -15,6 +18,7 @@ Feature: Validating the Booking.com for all the available api for the endpoint "
     Then response status code should be 200
     And the response body must have valid token
 
+  @regression
   Scenario: Verify unsuccessful authentication with invalid credentials will generate error message
     Given the base url of api is "https://automationintesting.online/api"
     When the user sends a POST request to the path "/auth/login" with invalid credentials
@@ -23,6 +27,8 @@ Feature: Validating the Booking.com for all the available api for the endpoint "
     Then response status code should be 401
     And the response body must have error message "Invalid credentials"
 
+  @sanity
+  @regression
   Scenario: Verify the rooms exist for booking from the booking.com application
     Given the base url of api is "https://automationintesting.online/api"
     When the user sends a GET request to the path "/room"
@@ -33,6 +39,7 @@ Feature: Validating the Booking.com for all the available api for the endpoint "
     |  2   | 102    | 150     |Double|
     |  3   | 103    | 225     |Suite |
 
+  @regression
   Scenario Outline: Verify the room details using roomId for booking from the booking application
     Given the base url of api is "https://automationintesting.online/api"
     When the user sends a GET request to the path "/room" with "<roomId>"
@@ -44,7 +51,9 @@ Feature: Validating the Booking.com for all the available api for the endpoint "
       |  2   | 102    | 150     |Double|TV,Radio,Safe   |
       |  3   | 103    | 225     |Suite |Radio,WiFi,Safe |
 
-
+  @sanity
+  @regression
+  @e2e
   Scenario: Verify the booking id for the booking endpoint when sending booking details with valid auth token
     Given the base url of api is "https://automationintesting.online/api"
     When the user sends a POST request to the path "/booking" with valid booking request
@@ -53,24 +62,30 @@ Feature: Validating the Booking.com for all the available api for the endpoint "
     Then response status code should be 201
     And the response body must have bookingId
 
+  @sanity
+  @regression
   Scenario: Verify the exist booking from the booking.com application with valid auth token
     Given the base url of api is "https://automationintesting.online/api"
     When the user sends a GET request to the path "/booking" for existing bookingId
     Then response status code should be 200
     And the response body must have all the booking details
       |roomid|  firstname         |    lastname        |depositpaid|bookingdates.checkin|bookingdates.checkout|email             |phone           |
-      |  2   |  123456            |    abcdefghijklmnop|           |    2026-07-23      |    2026-07-24       | 123@email.com    |  123456789012  |
+      |  1   |  123456            |    abcdefghijklmnop|           |    2026-07-23      |    2026-07-24       | 123@email.com    |  123456789012  |
 
+  @sanity
+  @regression
   Scenario: Verify the updation of the exist booking from the booking.com application with valid auth token
     Given the base url of api is "https://automationintesting.online/api"
     When the user sends a PUT request to the path "/booking" for existing bookingId
       |roomid|  firstname         |    lastname        |depositpaid|bookingdates.checkin|bookingdates.checkout|email             |phone           |
-      |  3   |  updatefirstname   |    updatelastname  |           |    2026-07-23      |    2026-07-24       | 1234@email.com    |  98745632198  |
+      |  1   |  updatefirstname   |    updatelastname  |           |    2026-07-23      |    2026-07-24       | 1234@email.com    |  98745632198  |
     Then response status code should be 200
     And the response body must have all the booking details
       |roomid|  firstname         |    lastname        |depositpaid|bookingdates.checkin|bookingdates.checkout|email             |phone           |
-      |  3   |  updatefirstname   |    updatelastname  |           |    2026-07-23      |    2026-07-24       | 1234@email.com    |  98745632198  |
+      |  1   |  updatefirstname   |    updatelastname  |           |    2026-07-23      |    2026-07-24       | 1234@email.com    |  98745632198  |
 
+  @sanity
+  @regression
   Scenario: Verify the partial update of the exist booking from the booking.com application with valid auth token
     Given the base url of api is "https://automationintesting.online/api"
     When the user sends a PATCH request to the path "/booking" for existing bookingId
@@ -79,6 +94,7 @@ Feature: Validating the Booking.com for all the available api for the endpoint "
     Then response status code should be 200
     And the response body must have all the booking details
 
+  @regression
   Scenario: Verify the error messages for the booking end point when sending invalid firstname
     Given the base url of api is "https://automationintesting.online/api"
     When the user sends a POST request to the path "/booking" with invalid booking firstname
@@ -87,6 +103,7 @@ Feature: Validating the Booking.com for all the available api for the endpoint "
     Then response status code should be 400
     And the response body must have errors message "size must be between 3 and 18"
 
+  @regression
   Scenario: Verify the error messages for the booking end point when sending invalid lastname
     Given the base url of api is "https://automationintesting.online/api"
     When the user sends a POST request to the path "/booking" with invalid booking lastname
@@ -95,6 +112,7 @@ Feature: Validating the Booking.com for all the available api for the endpoint "
     Then response status code should be 400
     And the response body must have errors message "size must be between 3 and 30"
 
+  @regression
   Scenario: Verify the error messages for the booking end point when sending invalid email
     Given the base url of api is "https://automationintesting.online/api"
     When the user sends a POST request to the path "/booking" with invalid booking email
@@ -103,6 +121,7 @@ Feature: Validating the Booking.com for all the available api for the endpoint "
     Then response status code should be 400
     And the response body must have errors message "must be a well-formed email address"
 
+  @regression
   Scenario: Verify the error messages for the booking end point when sending invalid phoneNumber
     Given the base url of api is "https://automationintesting.online/api"
     When the user sends a POST request to the path "/booking" with invalid booking phoneNumber
@@ -111,21 +130,44 @@ Feature: Validating the Booking.com for all the available api for the endpoint "
     Then response status code should be 400
     And the response body must have errors message "size must be between 11 and 21"
 
+  @regression
   Scenario: Verify the return code when retrieve booking from the booking.com application with invalid auth token
     Given the base url of api is "https://automationintesting.online/api"
     When the user sends a GET request to the path "/booking" for existing bookingId with invalid token
+     #Response code for auth failure i am getting 403 not 401 (may be not defined in sandbox)
     Then response status code should be 403
 
+  @regression
   Scenario: Verify the return code when update exist booking from the booking.com application with invalid auth token
     Given the base url of api is "https://automationintesting.online/api"
     When the user sends a PUT request to the path "/booking" for existing bookingId with invalid token
       |roomid|  firstname         |    lastname        |depositpaid|bookingdates.checkin|bookingdates.checkout|email             |phone           |
-      |  3   |  updatefirstname   |    updatelastname  |           |    2026-07-23      |    2026-07-24       | 1234@email.com    |  98745632198  |
+      |  1   |  updatefirstname   |    updatelastname  |           |    2026-07-23      |    2026-07-24       | 1234@email.com   |  98745632198  |
+     #Response code for auth failure i am getting 403 not 401 (may be not defined in sandbox)
     Then response status code should be 403
 
+  @regression
   Scenario: Verify the return code when partial update of the exist booking from the booking.com application with invalid auth token
     Given the base url of api is "https://automationintesting.online/api"
     When the user sends a PATCH request to the path "/booking" for existing bookingId with invalid token
       |  firstname         |    lastname        |depositpaid|
       |  updatefirstname   |    updatelastname  |   true    |
+     #Response code for auth failure i am getting 403 not 401 (may be not defined in sandbox)
+    Then response status code should be 403
+
+  @sanity
+  @e2e
+  Scenario: Verify the delete of booking from the booking.com application with valid auth token
+    Given the base url of api is "https://automationintesting.online/api"
+    When the user sends a DELETE request to the path "/booking" for existing bookingId
+    #Response code for delete is 202 not 201 (may be not defined in sandbox)
+    Then response status code should be 202
+    #no message in the response
+    And the response body must have message "Booking deleted successfully"
+
+  @regression
+  Scenario: Verify the delete of booking from the booking.com application with invalid auth token
+    Given the base url of api is "https://automationintesting.online/api"
+    When the user sends a DELETE request to the path "/booking" for existing bookingId with invalid token
+     #Response code for auth failure i am getting 403 not 401 (may be not defined in sandbox)
     Then response status code should be 403
