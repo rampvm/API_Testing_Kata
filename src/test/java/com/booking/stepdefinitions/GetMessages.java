@@ -233,4 +233,16 @@ public class GetMessages {
         String bookingId = BookingContext.getBookingId();
         response=api.delete(endPoint+ "/" + bookingId,"abc123456");
     }
+
+    @When("the user sends a POST request to the path {string} with Checkout date before checkin date")
+    public void theUserSendsAPOSTRequestToThePathWithCheckoutDateBeforeCheckinDate(String endPoint, DataTable newPayload) {
+        Map<String, String> row = newPayload.asMaps(String.class, String.class).get(0);
+        BookingPayload payload = mapper.convertValue(row, BookingPayload.class);
+        response=api.post(endPoint,payload);
+    }
+
+    @And("the response body have errors message {string}")
+    public void theResponseBodyHaveErrorsMessage(String error) {
+        Assertions.assertEquals(error,response.path("error"));
+    }
 }

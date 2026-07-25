@@ -64,7 +64,7 @@ Feature: Validating the Booking.com for all the available api for the endpoint "
 
   @sanity
   @regression
-  Scenario: Verify the exist booking from the booking.com application with valid auth token
+  Scenario: Verify the exist booking from the booking.com application with valid auth token and booking id
     Given the base url of api is "https://automationintesting.online/api"
     When the user sends a GET request to the path "/booking" for existing bookingId
     Then response status code should be 200
@@ -74,7 +74,7 @@ Feature: Validating the Booking.com for all the available api for the endpoint "
 
   @sanity
   @regression
-  Scenario: Verify the updation of the exist booking from the booking.com application with valid auth token
+  Scenario: Verify the updation of the exist booking from the booking.com application with valid auth token and booking id
     Given the base url of api is "https://automationintesting.online/api"
     When the user sends a PUT request to the path "/booking" for existing bookingId
       |roomid|  firstname         |    lastname        |depositpaid|bookingdates.checkin|bookingdates.checkout|email             |phone           |
@@ -86,7 +86,7 @@ Feature: Validating the Booking.com for all the available api for the endpoint "
 
   @sanity
   @regression
-  Scenario: Verify the partial update of the exist booking from the booking.com application with valid auth token
+  Scenario: Verify the partial update of the exist booking from the booking.com application with valid auth token and booking id
     Given the base url of api is "https://automationintesting.online/api"
     When the user sends a PATCH request to the path "/booking" for existing bookingId
       |  firstname         |    lastname        |depositpaid|
@@ -131,6 +131,16 @@ Feature: Validating the Booking.com for all the available api for the endpoint "
     And the response body must have errors message "size must be between 11 and 21"
 
   @regression
+  Scenario: Verify the error messages for the booking end point when sending Checkout date before checkin date
+    Given the base url of api is "https://automationintesting.online/api"
+    When the user sends a POST request to the path "/booking" with Checkout date before checkin date
+      |roomid|  firstname         |    lastname        |depositpaid|bookingdates.checkin|bookingdates.checkout|email             |phone           |
+      |  1   |  123456789456123   |    123456789456123 |    false  |    2026-07-25      |    2026-07-24       | 123@email.com    |  12345678912   |
+     #Response code i am getting 409 not 400 (may be not defined in sandbox)
+    Then response status code should be 409
+    And the response body have errors message "Failed to create booking"
+
+  @regression
   Scenario: Verify the return code when retrieve booking from the booking.com application with invalid auth token
     Given the base url of api is "https://automationintesting.online/api"
     When the user sends a GET request to the path "/booking" for existing bookingId with invalid token
@@ -160,9 +170,9 @@ Feature: Validating the Booking.com for all the available api for the endpoint "
   Scenario: Verify the delete of booking from the booking.com application with valid auth token
     Given the base url of api is "https://automationintesting.online/api"
     When the user sends a DELETE request to the path "/booking" for existing bookingId
-    #Response code for delete is 202 not 201 (may be not defined in sandbox)
+     #Response code for delete is 202 not 201 (may be not defined in sandbox)
     Then response status code should be 202
-    #no message in the response
+     #no message in the response
     And the response body must have message "Booking deleted successfully"
 
   @regression
